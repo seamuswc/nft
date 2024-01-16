@@ -1,18 +1,18 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MintController;
+use App\Http\Controllers\RedeemController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
-
+// Display the form (assuming a single page for both forms)
 Route::get('/', function () {
-    return view('welcome');
+    return view('index_JP');
 });
+
+Route::get('/en', function () {
+    return view('index_EN');
+});
+
+// Handle form submissions
+Route::post('/mint', [MintController::class, 'store']);
+Route::post('/redeem', [RedeemController::class, 'store']);
