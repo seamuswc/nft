@@ -5,77 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>あなたのウェブサイト</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
-    <style>
-        .custom-button {
-            background-color: #f5f5f5;
-            color: #333;
-            border-color: #ddd;
-        }
-
-        .custom-button:hover {
-            background-color: #e8e8e8;
-            border-color: #ccc;
-        }
-
-        .custom-container {
-            max-width: 800px;
-            margin: auto;
-        }
-
-        .custom-title {
-            text-align: center;
-            font-size: 2em;
-            margin-bottom: 30px;
-        }
-
-        .custom-content {
-            font-size: 1.2em;
-        }
-
-        .custom-field {
-            margin-bottom: 20px;
-        }
-
-        .content p {
-            margin-bottom: 1em;
-        }
-
-        .button.is-primary {
-            background-color: #3273dc;
-            border-color: #3273dc;
-        }
-
-        .form-centered {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .form-centered .field,
-        .form-centered .control {
-            width: 100%;
-        }
-
-        .form-centered .control {
-            display: flex;
-            justify-content: center;
-        }
-
-        .custom-submit-button {
-            font-size: 1.5em;
-            padding: 1em 1.5em;
-            
-            background-color: #f5f5f5;
-            color: #333;
-            border-color: #ddd;
-        }
-
-        .custom-submit-button:hover {
-            background-color: #f5f5f5;
-            color: #333;
-            border-color: black;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 </head>
 <body>
 
