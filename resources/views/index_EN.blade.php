@@ -167,7 +167,7 @@
 <script>
     function switchLanguage() {
         // Replace 'http://example.jp' with the actual URL for your Japanese site
-        window.location.href = 'http://example.jp';
+        window.location.href = 'http://itadaku.xyz';
     }
 </script>
 

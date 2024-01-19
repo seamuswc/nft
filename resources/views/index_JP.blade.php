@@ -65,6 +65,8 @@
     <section id="mint" class="min-h-screen flex items-center justify-center">
         <div class="p-6 max-w-lg mx-auto">
             <form action="/mint" method="POST">
+            @csrf  <!-- CSRF Token -->
+
                 <input type="email" name="email" placeholder="Email" class="input-field">
                 <input type="text" name="tracking_number" placeholder="Tracking Number" class="input-field" >
                 <input type="text" name="ethereum_address" placeholder="Ethereum Address" class="input-field" >
@@ -109,7 +111,7 @@
     <script>
         function switchLanguage() {
             // Replace 'http://example.jp' with the actual URL for your Japanese site
-            window.location.href = 'http://127.0.0.1:8000/en';
+            window.location.href = 'http://itadaku.xyz/en';
         }
     </script>
 
