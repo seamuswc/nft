@@ -13,7 +13,6 @@ class CreateMintsTable extends Migration
             $table->string('email');
             $table->string('tracking_number');
             $table->string('ethereum_address');
-            $table->string('mail_to_address');
             $table->timestamps();
         });
     }
