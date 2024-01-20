@@ -27,5 +27,5 @@ Route::get('/mint/success', function () {
     // Clear the session variable
     session()->forget('form_submitted');
 
-    return view('mint.success');
+    return view('mint_success');
 })->name('mint.success');
