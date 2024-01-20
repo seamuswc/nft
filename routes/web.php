@@ -16,3 +16,16 @@ Route::get('/en', function () {
 // Handle form submissions
 Route::post('/mint', [MintController::class, 'store']);
 Route::post('/redeem', [RedeemController::class, 'store']);
+
+//mint success
+Route::get('/mint/success', function () {
+    if (!session('form_submitted')) {
+        // If the form was not submitted, redirect to a different page
+        return redirect('/');
+    }
+
+    // Clear the session variable
+    session()->forget('form_submitted');
+
+    return view('mint.success');
+})->name('mint.success');

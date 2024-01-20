@@ -20,8 +20,12 @@ class MintController extends Controller
         } catch (Exception $e) {
             // Do nothing and continue
             // You can leave this block empty or add a comment
+            //return back()->with('error', 'Email error');
         }
-        
-        return back()->with('success', 'Mint form submitted successfully.');
+
+        session(['formData' => $request->all()]);
+        session(['form_submitted' => true]);
+        return redirect()->route('mint.success');
+    
     }
 }
