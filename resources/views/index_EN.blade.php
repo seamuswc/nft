@@ -6,6 +6,7 @@
     <title>Your Website</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
+    
 </head>
 <body>
 
@@ -100,6 +101,8 @@
 </script>
 
 <!-- Add the path to your validation JavaScript file here -->
+<script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+<script src="{{ asset('js/config.js') }}"></script>
 <script src="{{ asset('js/validation.js') }}"></script>
 </body>
 </html>

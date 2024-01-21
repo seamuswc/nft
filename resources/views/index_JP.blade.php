@@ -91,6 +91,8 @@
         }
     </script>
 
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+    <script src="{{ asset('js/config.js') }}"></script>
     <script src="{{ asset('js/validation.js') }}"></script>
 </body>
 </html>
