@@ -83,10 +83,9 @@ document.addEventListener("DOMContentLoaded", function() {
             const usdc_address = "0xaf88d065e77c8cc2239327c5edb3a432268e5831";
             const tokenAmount = '1000000'; // Represents 1 USDC
 
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
 
             try {
-                setAllowance(usdc_address, spenderAddress, tokenAmount)
+                await setAllowance(usdc_address, spenderAddress, tokenAmount)
                 // Call the smart contract function
                 const tx = await contract.mintNFT(ethereumAddress, tokenURI);
                 await tx.wait();
