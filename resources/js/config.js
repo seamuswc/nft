@@ -622,6 +622,5 @@ const config = {
     TOKEN_URI: "meta.json"
 };
 
-export default config;
 
 

@@ -1,4 +1,3 @@
-import config from './config.js';
 
 document.addEventListener("DOMContentLoaded", function() {
     const mintForm = document.querySelector('#mint form');
