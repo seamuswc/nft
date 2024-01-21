@@ -1,3 +1,3 @@
 import './bootstrap';
-import './config.js';
+import config from './config.js';
 import './validation.js';
