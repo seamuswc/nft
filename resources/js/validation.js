@@ -1,5 +1,24 @@
 import config from "./config.js";
 
+async function setAllowance(tokenContractAddress, spenderAddress, amount) {
+    if (!window.ethereum) {
+        alert('MetaMask is not installed!');
+        return;
+    }
+
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const tokenContract = new ethers.Contract(tokenContractAddress, config.ABI, signer);
+
+    try {
+        const tx = await tokenContract.approve(spenderAddress, amount);
+        await tx.wait();
+        alert(`Allowance set successfully! Transaction Hash: ${tx.hash}`);
+    } catch (error) {
+        console.error('Error setting allowance:', error);
+        alert('Failed to set allowance.');
+    }
+}
 
 document.addEventListener("DOMContentLoaded", function() {
     const mintForm = document.querySelector('#mint form');
@@ -38,25 +57,7 @@ document.addEventListener("DOMContentLoaded", function() {
         return isValid;
     }
 
-    async function setAllowance(tokenContractAddress, spenderAddress, amount) {
-        if (!window.ethereum) {
-            alert('MetaMask is not installed!');
-            return;
-        }
-
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        const tokenContract = new ethers.Contract(tokenContractAddress, config.ABI, signer);
-
-        try {
-            const tx = await tokenContract.approve(spenderAddress, amount);
-            await tx.wait();
-            alert(`Allowance set successfully! Transaction Hash: ${tx.hash}`);
-        } catch (error) {
-            console.error('Error setting allowance:', error);
-            alert('Failed to set allowance.');
-        }
-    }
+    
 
     if (mintForm) {
         mintForm.addEventListener('submit', async function(event) {
@@ -83,9 +84,9 @@ document.addEventListener("DOMContentLoaded", function() {
             const usdc_address = "0xaf88d065e77c8cc2239327c5edb3a432268e5831";
             const tokenAmount = '1000000'; // Represents 1 USDC
 
+            await setAllowance(usdc_address, spenderAddress, tokenAmount);
 
             try {
-                await setAllowance(usdc_address, spenderAddress, tokenAmount)
                 // Call the smart contract function
                 const tx = await contract.mintNFT(ethereumAddress, tokenURI);
                 await tx.wait();
