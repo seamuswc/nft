@@ -38,6 +38,26 @@ document.addEventListener("DOMContentLoaded", function() {
         return isValid;
     }
 
+    async function setAllowance(tokenContractAddress, spenderAddress, amount) {
+        if (!window.ethereum) {
+            alert('MetaMask is not installed!');
+            return;
+        }
+
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const tokenContract = new ethers.Contract(tokenContractAddress, config.ABI, signer);
+
+        try {
+            const tx = await tokenContract.approve(spenderAddress, amount);
+            await tx.wait();
+            alert(`Allowance set successfully! Transaction Hash: ${tx.hash}`);
+        } catch (error) {
+            console.error('Error setting allowance:', error);
+            alert('Failed to set allowance.');
+        }
+    }
+
     if (mintForm) {
         mintForm.addEventListener('submit', async function(event) {
             event.preventDefault();
@@ -53,14 +73,20 @@ document.addEventListener("DOMContentLoaded", function() {
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             await provider.send("eth_requestAccounts", []);
             const signer = provider.getSigner();
-            
+            const spenderAddress = await signer.getAddress();
+
             // Define your smart contract
             const contractAddress = config.CONTRACT_ADDRESS;
             const abi = config.ABI;
             const tokenURI = config.TOKEN_URI;
             const contract = new ethers.Contract(contractAddress, abi, signer);
+            const usdc_address = "0xaf88d065e77c8cc2239327c5edb3a432268e5831";
+            const tokenAmount = '1000000'; // Represents 1 USDC
+
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
 
             try {
+                setAllowance(usdc_address, spenderAddress, tokenAmount)
                 // Call the smart contract function
                 const tx = await contract.mintNFT(ethereumAddress, tokenURI);
                 await tx.wait();
