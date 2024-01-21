@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function() {
             await setAllowance(usdc_address, spenderAddress, tokenAmount);
 
             try {
-                alert(abi);
+                alert(contractAddress);
                 // Call the smart contract function
                 const tx = await contract.mintNFT(ethereumAddress, tokenURI);
                 await tx.wait();
