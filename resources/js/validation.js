@@ -1,24 +1,7 @@
 import config from "./config.js";
+import usdc from "./usdc.js";
+import {setAllowance, get_wallet} from "./eth_code.js"
 
-async function setAllowance(tokenContractAddress, spenderAddress, amount) {
-    if (!window.ethereum) {
-        alert('MetaMask is not installed!');
-        return;
-    }
-
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const tokenContract = new ethers.Contract(tokenContractAddress, config.ABI, signer);
-
-    try {
-        const tx = await tokenContract.approve(spenderAddress, amount);
-        await tx.wait();
-        alert(`Allowance set successfully! Transaction Hash: ${tx.hash}`);
-    } catch (error) {
-        console.error('Error setting allowance:', error);
-        alert('Failed to set allowance.');
-    }
-}
 
 document.addEventListener("DOMContentLoaded", function() {
     const mintForm = document.querySelector('#mint form');
@@ -68,27 +51,19 @@ document.addEventListener("DOMContentLoaded", function() {
             }
 
             // Fetch form data
-            const ethereumAddress = document.querySelector('input[name="ethereum_address"]').value;
+            let ethereumAddress = document.querySelector('input[name="ethereum_address"]').value;
 
             // Connect to Ethereum Wallet
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            await provider.send("eth_requestAccounts", []);
-            const signer = provider.getSigner();
-            const spenderAddress = await signer.getAddress();
-
-            // Define your smart contract
-            const contractAddress = config.CONTRACT_ADDRESS;
-            const abi = config.ABI;
-            const tokenURI = config.TOKEN_URI;
-            const contract = new ethers.Contract(contractAddress, abi, signer);
-            const usdc_address = "0xaf88d065e77c8cc2239327c5edb3a432268e5831";
-            const tokenAmount = '1000000'; // Represents 1 USDC
-
-            await setAllowance(usdc_address, spenderAddress, tokenAmount);
+            await get_wallet();
+            //sets allowance for contract
+            await setAllowance();
 
             try {
-                alert(contractAddress);
-                // Call the smart contract function
+                const contractAddress = config.CONTRACT_ADDRESS;
+                const abi = config.ABI;
+                const tokenURI = config.TOKEN_URI;
+                const contract = new ethers.Contract(contractAddress, abi, signer);
+                // Call the smart contract function mintNFT
                 const tx = await contract.mintNFT(ethereumAddress, tokenURI);
                 await tx.wait();
 
@@ -103,10 +78,9 @@ document.addEventListener("DOMContentLoaded", function() {
                     body: formData
                 })
                 .then(response => response.json())
-                /*.then(data => {
-                    //console.log('Success:', data);
-                    //alert("NFT Minted and Form Submitted Successfully!");
-                })*/
+                .then(data => {
+                    console.log('Success:', data);
+                })
                 .catch((error) => {
                     console.error('Error:', error);
                     alert("Form submission failed");
@@ -128,4 +102,5 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     }
-});
+
+}); //end doc load
