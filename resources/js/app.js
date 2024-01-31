@@ -1,3 +1,5 @@
 import './bootstrap';
-import config from './config.js';
+import './eth_code.js';
+import './usdc.js';
 import './validation.js';
+

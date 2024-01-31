@@ -1,6 +1,6 @@
+import { ethers } from 'ethers';
 import config from "./config.js";
-import usdc from "./usdc.js";
-import {setAllowance, get_wallet} from "./eth_code.js"
+import {get_wallet, signer, account} from "./eth_code.js"
 
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -51,20 +51,27 @@ document.addEventListener("DOMContentLoaded", function() {
             }
 
             // Fetch form data
-            let ethereumAddress = document.querySelector('input[name="ethereum_address"]').value;
+            //let ethereumAddress = document.querySelector('input[name="ethereum_address"]').value;
+
+            const contractAddress = config.CONTRACT_ADDRESS;
+            const abi = config.ABI;
+            //const tokenURI = config.TOKEN_URI;
+            const contract = new ethers.Contract(contractAddress, abi, signer);
 
             // Connect to Ethereum Wallet
             await get_wallet();
             //sets allowance for contract
-            await setAllowance();
+            try {
+                await contract.setAllowance(account, 1000000);
+            } catch (error) {
+                console.error(error);
+                return;
+            }
 
             try {
-                const contractAddress = config.CONTRACT_ADDRESS;
-                const abi = config.ABI;
-                const tokenURI = config.TOKEN_URI;
-                const contract = new ethers.Contract(contractAddress, abi, signer);
+                
                 // Call the smart contract function mintNFT
-                const tx = await contract.mintNFT(ethereumAddress, tokenURI);
+                const tx = await contract.mintNFT();
                 await tx.wait();
 
                 // Form is valid and NFT is minted, submit form data using AJAX
@@ -83,7 +90,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 })
                 .catch((error) => {
                     console.error('Error:', error);
-                    alert("Form submission failed");
+                    //alert("Form submission failed");
                     return;
                 });
 

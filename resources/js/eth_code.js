@@ -1,39 +1,9 @@
 
+import { ethers } from 'ethers';
 
-import usdc from "./usdc.js";
-import config from "./config.js";
-
-let provider;
-let signer;
-let account;
-
-
-export async function setAllowance() {
-    if (!window.ethereum) {
-        alert("MetaMask is not installed!");
-        return;
-    }
-
-    try {
-        const ONE_USDC = ethers.utils.parseUnits("1", 6); // USDC has 6 decimal places
-        const usdcContract = new ethers.Contract(usdc.CONTRACT_ADDRESS, usdc.ABI, signer);
-        
-        // Check current allowance
-        const currentAllowance = await usdcContract.allowance(account, config.CONTRACT_ADDRESS);
-
-        if (currentAllowance.lt(ONE_USDC)) {
-            // Insufficient allowance, need to approve
-            const tx = await usdcContract.approve(config.CONTRACT_ADDRESS, ONE_USDC);
-            await tx.wait();
-            console.log(`Allowance updated. Transaction Hash: ${tx.hash}`);
-        } else {
-            console.log("Sufficient allowance already set.");
-        }
-    } catch (error) {
-        console.error("Error setting allowance:", error);
-    }
-}
-
+export let provider;
+export let signer;
+export let account;
 
 export async function get_wallet() {
     try {
@@ -43,6 +13,7 @@ export async function get_wallet() {
         await provider.send("eth_requestAccounts", []);
         signer = provider.getSigner();
         account = await signer.getAddress(); 
+        console.log("metamask connected")
     } catch (error) {
             console.error('Error in get_wallet:', error);
             // Handle the error appropriately
