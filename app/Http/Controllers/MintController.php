@@ -23,9 +23,13 @@ class MintController extends Controller
             //return back()->with('error', 'Email error');
         }
 
+       
         session(['formData' => $request->all()]);
         session(['form_submitted' => true]);
         return redirect()->route('mint.success');
     
     }
+
+  
+
 }

@@ -1,5 +1,7 @@
 import './bootstrap';
-import './eth_code.js';
-import './usdc.js';
-import './validation.js';
 
+import Alpine from 'alpinejs';
+
+window.Alpine = Alpine;
+
+Alpine.start();

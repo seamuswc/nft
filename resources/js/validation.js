@@ -1,113 +1,94 @@
-import { ethers } from 'ethers';
-import config from "./config.js";
-import {get_wallet, signer, account} from "./eth_code.js"
+import {connectWallet, approveDAI, mintNFT, getDAIAllowance, web3, mintEvent } from "./eth_code";
+
+// Function to validate an email
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+}
+
+// Function to validate a form
+function validateForm(form) {
+    let isValid = true;
+
+    form.find("input").each(function() {
+        const input = $(this);
+        const isEmpty = input.val().trim() === '';
+        const isInvalidEmail = input.attr('type') === 'email' && !validateEmail(input.val());
+
+        if ((input.attr('required') || isEmpty) ||
+            (input.attr('type') === 'email' && !isEmpty && isInvalidEmail)) {
+            isValid = false;
+            input.addClass('is-danger');
+        } else {
+            input.removeClass('is-danger');
+        }
+    });
+
+    return isValid;
+}
 
 
-document.addEventListener("DOMContentLoaded", function() {
-    const mintForm = document.querySelector('#mint form');
-    const redeemForm = document.querySelector('#redeem form');
-    const csrfToken = mintForm.querySelector('input[name="_token"]').value;
 
+$(document).ready(function() {
 
-    function validateEmail(email) {
-        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return re.test(String(email).toLowerCase());
-    }
+    $('#connectWalletButton').on('click', function() {
+        connectWallet();
+    });
 
-    function validateEthereumAddress(address) {
-        const re = /^0x[a-fA-F0-9]{40}$/;
-        return re.test(address);
-    }
+    const mintForm = $('#mint form');
+    const redeemForm = $('#redeem form');
 
-    function validateForm(form) {
-        let isValid = true;
-
-        form.querySelectorAll("input").forEach(input => {
-            const isEmpty = input.value.trim() === '';
-            const isInvalidEmail = input.type === 'email' && !validateEmail(input.value);
-            const isInvalidEthAddress = input.name === 'ethereum_address' && !validateEthereumAddress(input.value);
-            
-            if ((input.required || isEmpty) || 
-                (input.type === 'email' && !isEmpty && isInvalidEmail) || 
-                (input.name === 'ethereum_address' && !isEmpty && isInvalidEthAddress)) {
-                isValid = false;
-                input.classList.add('is-danger');
-            } else {
-                input.classList.remove('is-danger');
-            }
-        });
-
-        return isValid;
-    }
-
-    
-
-    if (mintForm) {
-        mintForm.addEventListener('submit', async function(event) {
+    if (mintForm.length > 0) {
+        mintForm.on('submit', async function(event) {
             event.preventDefault();
 
             if (!validateForm(mintForm)) {
                 return; // Form is not valid, stop here
             }
 
-            // Fetch form data
-            //let ethereumAddress = document.querySelector('input[name="ethereum_address"]').value;
-
-            const contractAddress = config.CONTRACT_ADDRESS;
-            const abi = config.ABI;
-            //const tokenURI = config.TOKEN_URI;
-            const contract = new ethers.Contract(contractAddress, abi, signer);
-
-            // Connect to Ethereum Wallet
-            await get_wallet();
-            //sets allowance for contract
-            try {
-                await contract.setAllowance(account, 1000000);
-            } catch (error) {
-                console.error(error);
+            //connect to MetaMask
+            const walletConnected = await connectWallet();
+            if(!walletConnected) {
                 return;
             }
 
-            try {
-                
-                // Call the smart contract function mintNFT
-                const tx = await contract.mintNFT();
-                await tx.wait();
-
-                // Form is valid and NFT is minted, submit form data using AJAX
-                const formData = new FormData(mintForm);
-                fetch('/mint', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Content-Type': 'application/json' // or 'application/x-www-form-urlencoded' etc., depending on your needs
-                    },
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Success:', data);
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
-                    //alert("Form submission failed");
-                    return;
-                });
-
-            } catch (error) {
-                console.error(error);
-                alert("An error occurred while minting the NFT");
-                return;
+            let NFT_COST = '1'; //for allowance only so it can stay front end
+            let cost= web3.utils.toWei(NFT_COST, 'ether');
+            let allowance = await getDAIAllowance();
+            // Then, the user can mint the NFT
+            if(allowance < cost) {
+                 // First, the user approves the DAI transfer
+                await approveDAI(cost);
             }
+
+            let tx_hash = await mintNFT();
+
+            mintEvent().then(nft_id => {
+                if (nft_id && tx_hash) {
+                    // Set the value of the hidden input fields
+                    $('#nft_id').val(nft_id);
+                    $('#tx_hash').val(tx_hash);
+
+                    // Submit the form
+                    mintForm.off('submit').submit();
+                }
+            }).catch(error => {
+                console.error("Error in mintEvent:", error);
+                // Handle error appropriately
+            });
+
+
         });
     }
 
-    if (redeemForm) {
-        redeemForm.addEventListener('submit', function(event) {
+    if (redeemForm.length > 0) {
+        redeemForm.on('submit', function(event) {
             if (!validateForm(redeemForm)) {
                 event.preventDefault();
             }
+
+            //nftContract.methods.approve(contractAddress, tokenId).send({ from: userAddress });
+
         });
     }
-
-}); //end doc load
+});

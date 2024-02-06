@@ -15,6 +15,9 @@ class CreateRedeemsTable extends Migration
             $table->string('mailing_address_1');
             $table->string('mailing_address_2');
             $table->string('mailing_address_3');
+            $table->string('tx_hash');
+            $table->integer('nft_id');
+            $table->boolean('redeemed')->default(false);
             $table->timestamps();
         });
     }

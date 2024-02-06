@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Website</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.3.4/dist/web3.min.js"></script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
     
@@ -35,9 +38,7 @@
                 <div class="field custom-field">
                     <input class="input" type="text" name="tracking_number" placeholder="Tracking Number">
                 </div>
-                <div class="field custom-field">
-                    <input class="input" type="text" name="ethereum_address" placeholder="Ethereum Address">
-                </div>
+                
 
                 <div class="has-text-centered">
                     <br>
@@ -46,6 +47,9 @@
                     <p>Newtown, Imaginaria, 54321</p>
                     <br>
                 </div>
+
+                <input type="hidden" name="nft_id" id="nft_id">
+                <input type="hidden" name="tx_hash" id="tx_hash">
                 
             </form>
            
@@ -77,6 +81,8 @@
                     <input class="input" type="text" name="mailing_address_3" placeholder="Additional Mailing Address">
                 </div>
                 
+
+                
             </form>
         </div>
     </section>
@@ -101,7 +107,6 @@
 </script>
 
 <!-- Add the path to your validation JavaScript file here -->
-<script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
 @vite('resources/js/app.js')
 
 </body>

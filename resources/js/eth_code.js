@@ -1,67 +1,121 @@
+import config from "./config";
+import dai from "./dai";
 
-import { ethers } from 'ethers';
+export let web3;
+export let userAddress;
 
-export let provider;
-export let signer;
-export let account;
+async function switchToArbitrum() {
+    const arbitrumParams = {
+        chainId: '0xa4b1', // Arbitrum One's chain ID in hexadecimal
+        chainName: 'Arbitrum One',
+        nativeCurrency: {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            decimals: 18
+        },
+        rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+        blockExplorerUrls: ['https://arbiscan.io/']
+    };
 
-export async function get_wallet() {
     try {
-        await switchToArbitrum();
-        // Connect to Ethereum Wallet
-        provider = new ethers.providers.Web3Provider(window.ethereum);
-        await provider.send("eth_requestAccounts", []);
-        signer = provider.getSigner();
-        account = await signer.getAddress(); 
-        console.log("metamask connected")
+        await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: arbitrumParams.chainId }],
+        });
+        return true;
     } catch (error) {
-            console.error('Error in get_wallet:', error);
-            // Handle the error appropriately
+        if (error.code === 4902) {
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_addEthereumChain',
+                    params: [arbitrumParams],
+                });
+                return true;
+            } catch (addError) {
+                console.error('Failed to add Arbitrum network', addError);
+                return false;
+            }
+        } else {
+            console.error('Failed to switch to Arbitrum network', error);
+            return false;
+        }
     }
 }
 
-async function switchToArbitrum() {
-    try {
-        // Check if MetaMask is installed
-        if (window.ethereum) {
-            // Arbitrum Mainnet Parameters
-            const arbitrumParams = {
-                chainId: '0xa4b1', // Hexadecimal chainId of the Arbitrum network
-                chainName: 'Arbitrum One',
-                nativeCurrency: {
-                    name: 'Ether',
-                    symbol: 'ETH', // Typically, the native currency symbol is ETH on L2s
-                    decimals: 18
-                },
-                rpcUrls: ['https://arb1.arbitrum.io/rpc'], // The RPC URL of Arbitrum Mainnet
-                blockExplorerUrls: ['https://arbiscan.io/']
-            };
+export async function connectWallet() {
+    if (typeof window.ethereum !== 'undefined') {
+        web3 = new Web3(window.ethereum);
 
-            // Switch to Arbitrum network
-            await window.ethereum.request({
-                method: 'wallet_switchEthereumChain',
-                params: [{ chainId: arbitrumParams.chainId }],
-            }).catch(async (switchError) => {
-                // This error code indicates that the chain has not been added to MetaMask
-                if (switchError.code === 4902) {
-                    try {
-                        await window.ethereum.request({
-                            method: 'wallet_addEthereumChain',
-                            params: [arbitrumParams],
-                        });
-                    } catch (addError) {
-                        // Handle errors when adding the Arbitrum network
-                        console.error(addError);
-                    }
-                } else {
-                    // Handle other errors
-                    console.error(switchError);
-                }
-            });
-        } else {
-            alert('MetaMask is not installed!');
+        const switched = await switchToArbitrum();
+        if (!switched) {
+            alert("Failed to switch to or add Arbitrum network!");
+            return false;
         }
+
+        try {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            userAddress = accounts[0];
+            console.log("ADDRESS: ", userAddress);
+
+            // Assuming that the switch was successful, the network should now be Arbitrum
+            $("#walletAddress").text(userAddress);
+            $('#networkConnected').text("Arbitrum");
+
+            return true;
+        } catch (error) {
+            console.error("User denied account access");
+            return false;
+        }
+    } else {
+        console.error("Ethereum browser not detected!");
+        return false;
+    }
+}
+
+const daiContract = new web3.eth.Contract(dai.ABI, dai.CONTRACT_ADDRESS);
+export async function approveDAI(amount) {
+
+
+    let estimatedGas = await daiContract.methods.approve(dai.CONTRACT_ADDRESS, amount).estimateGas({ from: userAddress });
+
+    await daiContract.methods.approve(config.CONTRACT_ADDRESS, amount).send({ from: userAddress, gas: estimatedGas });
+}
+
+const nftContract = new web3.eth.Contract(config.ABI, config.CONTRACT_ADDRESS);
+export async function mintNFT() {
+
+    let estimatedGas = await nftContract.methods.mintNFT().estimateGas({ from: userAddress });
+
+    let tx = await nftContract.methods.mintNFT().send({ from: userAddress, gas: estimatedGas });
+    let txHash = tx.transactionHash;
+
+    return txHash;
+}
+
+export function mintEvent() {
+    return new Promise((resolve, reject) => {
+        nftContract.events.NFTMinted({
+            filter: { user: userAddress },
+            fromBlock: 'latest'
+        })
+        .on('data', function(event) {
+            console.log('NFT Minted:', event.returnValues);
+            resolve(event.returnValues.tokenId); // Assuming tokenId is the key you're interested in
+        })
+        .on('error', error => reject(error));
+    });
+}
+
+
+
+export async function getDAIAllowance() {
+    try {
+        const daiContract = new web3.eth.Contract(dai.ABI, dai.CONTRACT_ADDRESS);
+        const allowance = await daiContract.methods.allowance(userAddress, config.CONTRACT_ADDRESS).call();
+        console.log("Allowance:", allowance);
+        return allowance;
     } catch (error) {
-        console.error(error);
+        console.error("Error in checking DAI allowance:", error);
+        throw error; // or return some error indicator
     }
 }

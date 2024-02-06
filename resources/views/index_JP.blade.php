@@ -4,10 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>あなたのウェブサイト</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.3.4/dist/web3.min.js"></script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 </head>
 <body>
+
+        <div class="container has-text-centered">
+            
+            <div class="columns is-desktop">
+                <div class="column">
+                    <!-- This space is intentionally left blank for offset on larger screens -->
+                </div>
+                <div class="column responsive-content">
+                    <div class="field">
+                        <button class="button is-primary" id="connectWalletButton">Connect to MetaMask</button>
+                        <div class="content mt-4">
+                            Connected Network: <span id="networkConnected">Not connected</span><br>
+                            Connected Address: <span id="walletAddress">Not connected</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
     <!-- Navigation Buttons -->
     <div class="buttons has-addons is-centered" style="margin-top: 20px;">
@@ -32,9 +52,7 @@
                 <div class="field custom-field">
                     <input class="input" type="text" name="tracking_number" placeholder="追跡番号">
                 </div>
-                <div class="field custom-field">
-                    <input class="input" type="text" name="ethereum_address" placeholder="イーサリアムアドレス">
-                </div>
+                
                 <div class="has-text-centered">
                     <br>
                     <p>送付先住所:</p>
@@ -42,6 +60,8 @@
                     <p>Newtown, Imaginaria, 54321</p>
                     <br>
                 </div>
+                <input type="hidden" name="nft_id" id="nft_id">
+                <input type="hidden" name="tx_hash" id="tx_hash">
             </form>
         </div>
     </section>
@@ -69,6 +89,7 @@
                 <div class="field custom-field">
                     <input class="input" type="text" name="mailing_address_3" placeholder="追加の郵送先住所">
                 </div>
+                
             </form>
         </div>
     </section>
@@ -91,7 +112,7 @@
         }
     </script>
 
-    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+
     @vite('resources/js/app.js')
 
 </body>

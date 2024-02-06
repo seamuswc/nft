@@ -12,7 +12,8 @@ class CreateMintsTable extends Migration
             $table->id();
             $table->string('email');
             $table->string('tracking_number');
-            $table->string('ethereum_address');
+            $table->string('tx_hash');
+            $table->integer('nft_id'); 
             $table->timestamps();
         });
     }
